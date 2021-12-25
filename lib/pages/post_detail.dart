@@ -16,6 +16,7 @@ class PostDetail extends StatefulWidget {
 class _PostDetailState extends State<PostDetail> {
   PostsData postList;
   _PostDetailState(this.postList);
+  List<CommentsData> addingComments = [];
   String name = '';
   String mail = '';
   String commets = '';
@@ -37,6 +38,10 @@ class _PostDetailState extends State<PostDetail> {
         commentsListInId.add(item);
       }
     }
+    if (addingComments.isNotEmpty) {
+      await DatabaseClass.instance.createComment(addingComments[0]);
+    }
+    addingComments = [];
 
     return commentsListInId;
   }
@@ -85,7 +90,15 @@ class _PostDetailState extends State<PostDetail> {
               ),
               TextButton(
                 onPressed: () {
+                  addingComments.add(CommentsData(
+                      idPost: postList.idPost,
+                      idComment: 800,
+                      name: name,
+                      email: mail,
+                      body: commets));
+                  setState(() {});
                   pushCommit(name, mail, commets, postList.idPost);
+
                   Navigator.pop(context, 'OK');
                 },
                 child: const Text('Отправить'),
@@ -116,7 +129,7 @@ class _PostDetailState extends State<PostDetail> {
       body: Column(children: [
         Container(
             padding: EdgeInsets.all(10),
-            height: getScreenHeight() * 0.2,
+            height: getScreenHeight() * 0.25,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -128,7 +141,7 @@ class _PostDetailState extends State<PostDetail> {
               ],
             )),
         Container(
-            height: getScreenHeight() * 0.7,
+            height: getScreenHeight() * 0.65,
             child: FutureBuilder<List<CommentsData>>(
               future: getComment(),
               builder: (BuildContext context,
